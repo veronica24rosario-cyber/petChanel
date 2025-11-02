@@ -20,7 +20,7 @@ const Contact = () => {
     setSending(true);
     setStatus('');
 
-    const FORM_URL = 'https://formspree.io/f/mwpwwnag'; // tu enlace de Formspree
+    const FORM_URL = 'https://formspree.io/f/mzzkygwg'; // tu enlace de Formspree
 
     const data = new FormData();
     data.append('name', formData.name);
