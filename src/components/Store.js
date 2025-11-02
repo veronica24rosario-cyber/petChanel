@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase"; // Asegúrate que la ruta sea correcta
+import { db } from "../firebase";
+import { Trash2 } from "lucide-react"; // 🗑️ ícono moderno
 
 const Store = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
 
-  // 🔹 Cargar productos desde Firebase Firestore
+  // 🔹 Cargar productos desde Firebase
   useEffect(() => {
     const loadProductsFromFirebase = async () => {
       try {
@@ -18,13 +19,13 @@ const Store = () => {
         }));
         setProducts(items);
       } catch (error) {
-        console.error("Error al cargar productos desde Firebase:", error);
+        console.error("Error al cargar productos:", error);
       }
     };
 
     loadProductsFromFirebase();
 
-    // Si tenés productos guardados en localStorage (por si acaso)
+    // Cargar carrito guardado
     const storedCart = localStorage.getItem("cart");
     if (storedCart) setCart(JSON.parse(storedCart));
   }, []);
@@ -36,7 +37,15 @@ const Store = () => {
     localStorage.setItem("cart", JSON.stringify(updated));
   };
 
-  const total = cart.reduce((acc, item) => acc + item.precio, 0);
+  // 🔹 Eliminar producto del carrito
+  const removeFromCart = (index) => {
+    const updated = cart.filter((_, i) => i !== index);
+    setCart(updated);
+    localStorage.setItem("cart", JSON.stringify(updated));
+  };
+
+  // 🔹 Calcular total (corrige el NaN)
+  const total = cart.reduce((acc, item) => acc + Number(item.precio || 0), 0);
 
   return (
     <motion.div
@@ -53,11 +62,9 @@ const Store = () => {
         </p>
       </div>
 
-      {/* 🔹 Mostrar productos desde Firebase */}
+      {/* 🔹 Productos */}
       {products.length === 0 ? (
-        <p className="text-center text-gray-500">
-          No hay productos disponibles.
-        </p>
+        <p className="text-center text-gray-500">No hay productos disponibles.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {products.map((product) => (
@@ -93,11 +100,23 @@ const Store = () => {
         ) : (
           <ul className="space-y-2 mb-4">
             {cart.map((item, index) => (
-              <li key={index} className="flex justify-between">
+              <li
+                key={index}
+                className="flex justify-between items-center border-b pb-2"
+              >
                 <span>{item.nombre}</span>
-                <span className="text-purple-600 font-semibold">
-                  Q{item.precio}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-purple-600 font-semibold">
+                    Q{item.precio}
+                  </span>
+                  <button
+                    onClick={() => removeFromCart(index)}
+                    className="text-red-500 hover:text-red-700"
+                    title="Eliminar"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
