@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
-import { Trash2 } from "lucide-react"; // 🗑️ ícono moderno
+import { Trash2 } from "lucide-react";
 
 const Store = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
 
-  // 🔹 Cargar productos desde Firebase
+  // 🔹 Cargar productos desde Firestore
   useEffect(() => {
     const loadProductsFromFirebase = async () => {
       try {
@@ -25,7 +25,7 @@ const Store = () => {
 
     loadProductsFromFirebase();
 
-    // Cargar carrito guardado
+    // 🔹 Cargar carrito guardado en localStorage
     const storedCart = localStorage.getItem("cart");
     if (storedCart) setCart(JSON.parse(storedCart));
   }, []);
@@ -62,9 +62,9 @@ const Store = () => {
         </p>
       </div>
 
-      {/* 🔹 Productos */}
+      {/* 🔹 Lista de productos */}
       {products.length === 0 ? (
-        <p className="text-center text-gray-500">No hay productos disponibles.</p>
+        <p className="text-center text-gray-500">Cargando productos...</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {products.map((product) => (
@@ -79,6 +79,9 @@ const Store = () => {
               />
               <div className="p-4">
                 <h2 className="text-xl font-semibold">{product.nombre}</h2>
+                <p className="text-gray-600 text-sm mb-2">
+                  {product.descripcion}
+                </p>
                 <p className="text-purple-600 font-bold">Q{product.precio}</p>
                 <button
                   onClick={() => addToCart(product)}
